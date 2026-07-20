@@ -34,8 +34,10 @@ public class Lexer {
                 advance();
                 yield new Token(TokenType.RBRACE, "}", startLine, startColumn);
             }
-            default -> throw new RuntimeException(
-                    "Unexpected character: '" + c + "' at line " + startLine + ", column " + startColumn
+            default -> throw new JsonParseException(
+                    "Unexpected character: '" + c,
+                    startLine,
+                    startColumn
             );
         };
     }
