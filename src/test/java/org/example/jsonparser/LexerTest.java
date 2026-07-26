@@ -7,6 +7,7 @@ import java.io.PushbackReader;
 import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LexerTest {
 
@@ -78,5 +79,14 @@ public class LexerTest {
         Token token = lexer.nextToken();
         assertEquals(TokenType.STRING, token.type());
         assertEquals("\"He said \\\"hi\\\"\"", token.lexeme());
+    }
+
+    @Test
+    void throwsOnUnterminatedString() throws IOException {
+        StringReader reader = new StringReader("\"hello");
+        PushbackReader pbReader = new PushbackReader(reader);
+        Lexer lexer = new Lexer(pbReader);
+
+        assertThrows(JsonParseException.class, lexer::nextToken);
     }
 }
