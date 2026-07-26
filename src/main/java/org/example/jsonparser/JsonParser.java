@@ -13,12 +13,7 @@ public class JsonParser {
             System.exit(1);
         }
 
-        for (String arg : args) {
-            System.out.println(arg);
-        }
-
         Path path = Path.of(args[0]);
-        System.out.println(path.toString());
         try (BufferedReader bufferedReader = Files.newBufferedReader(path)) {
             PushbackReader reader = new PushbackReader(bufferedReader);
 

@@ -34,6 +34,15 @@ public class Lexer {
                 advance();
                 yield new Token(TokenType.RBRACE, "}", startLine, startColumn);
             }
+            case ':' -> {
+                advance();
+                yield new Token(TokenType.COLON, ":", startLine, startColumn);
+            }
+            case ',' -> {
+                advance();
+                yield new Token(TokenType.COMMA, ",", startLine, startColumn);
+            }
+            case '"' -> readString(startLine, startColumn);
             default -> throw new JsonParseException(
                     "Unexpected character: '" + c,
                     startLine,
@@ -42,7 +51,34 @@ public class Lexer {
         };
     }
 
-    public void advance() throws IOException {
+    private Token readString(int startLine, int startColumn) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        sb.append('"');
+        advance();
+
+        while (currentChar != '"' && currentChar != -1) {
+            if (currentChar == '\\') {
+                sb.append('\\');
+                advance();
+
+                if (currentChar == -1) {
+                    throw new JsonParseException("Unterminated string", startLine, startColumn);
+                }
+            }
+            sb.append((char) currentChar);
+            advance();
+        }
+
+        if (currentChar == -1) {
+            throw new JsonParseException("Unterminated string", startLine, startColumn);
+        }
+        sb.append('"');
+        advance();
+
+        return new Token(TokenType.STRING, sb.toString(), startLine, startColumn);
+    }
+
+    private void advance() throws IOException {
         currentChar = reader.read();
         if (currentChar == '\n') {
             line++;
