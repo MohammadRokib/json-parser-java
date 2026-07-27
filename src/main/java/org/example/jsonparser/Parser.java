@@ -18,7 +18,24 @@ public class Parser {
 
     private void parseObject() throws IOException {
         eat(TokenType.LBRACE);
+        if (currentToken.type() != TokenType.RBRACE) {
+            parsePairs();
+        }
         eat(TokenType.RBRACE);
+    }
+
+    private void parsePairs() throws IOException {
+        while(true) {
+            eat(TokenType.STRING);
+            eat(TokenType.COLON);
+            eat(TokenType.STRING);
+
+            if (currentToken.type() == TokenType.COMMA) {
+                eat(TokenType.COMMA);
+            } else {
+                break;
+            }
+        }
     }
 
     private void eat(TokenType type) throws IOException {

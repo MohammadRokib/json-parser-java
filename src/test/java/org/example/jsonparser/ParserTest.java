@@ -44,4 +44,58 @@ public class ParserTest {
 
         assertThrows(JsonParseException.class, parser::parse);
     }
+
+    @Test
+    public void parseSingleKeyValue() throws IOException {
+        StringReader reader = new StringReader("{\"key\": \"value\"}");
+        Lexer lexer = new Lexer(reader);
+        Parser parser = new Parser(lexer);
+
+        assertDoesNotThrow(parser::parse);
+    }
+
+    @Test
+    public void parseMultipleKeyValue() throws IOException {
+        StringReader reader = new StringReader("{\"key1\": \"value1\", \"key2\": \"value2\"}");
+        Lexer lexer = new Lexer(reader);
+        Parser parser = new Parser(lexer);
+
+        assertDoesNotThrow(parser::parse);
+    }
+
+    @Test
+    public void parseThrowOnMissingColon() throws IOException {
+        StringReader reader = new StringReader("{\"key\" \"value\"}");
+        Lexer lexer = new Lexer(reader);
+        Parser parser = new Parser(lexer);
+
+        assertThrows(JsonParseException.class, parser::parse);
+    }
+
+    @Test
+    public void parseThrowOnMissingComma() throws IOException {
+        StringReader reader = new StringReader("{\"key1\": \"value1\" \"key2\": \"value2\"}");
+        Lexer lexer = new Lexer(reader);
+        Parser parser = new Parser(lexer);
+
+        assertThrows(JsonParseException.class, parser::parse);
+    }
+
+    @Test
+    public void parseThrowOnMissingLBrace() throws IOException {
+        StringReader reader = new StringReader("\"key1\": \"value1\", \"key2\": \"value2\"}");
+        Lexer lexer = new Lexer(reader);
+        Parser parser = new Parser(lexer);
+
+        assertThrows(JsonParseException.class, parser::parse);
+    }
+
+    @Test
+    public void parseThrowOnMissingRBrace() throws IOException {
+        StringReader reader = new StringReader("{\"key1\": \"value1\", \"key2\": \"value2\"");
+        Lexer lexer = new Lexer(reader);
+        Parser parser = new Parser(lexer);
+
+        assertThrows(JsonParseException.class, parser::parse);
+    }
 }
