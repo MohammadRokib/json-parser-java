@@ -71,6 +71,18 @@ public class LexerTest {
     }
 
     @Test
+    void readEmptyStringToken() throws IOException {
+        StringReader reader = new StringReader("\"\"");
+        PushbackReader pbReader = new PushbackReader(reader);
+        Lexer lexer = new Lexer(pbReader);
+
+        Token token = lexer.nextToken();
+        assertEquals(TokenType.STRING, token.type());
+        assertEquals("\"\"", token.lexeme());
+    }
+
+
+    @Test
     void readStringWithEscaptedQuote() throws IOException {
         StringReader reader = new StringReader("\"He said \\\"hi\\\"\"");
         PushbackReader pbReader = new PushbackReader(reader);
