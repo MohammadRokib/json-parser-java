@@ -25,6 +25,11 @@ public class Lexer {
         }
 
         char c = (char) currentChar;
+
+        if (Character.isDigit(c) || c == '-') {
+            return readNumber(startLine, startColumn);
+        }
+
         return switch (c) {
             case '{' -> {
                 advance();
@@ -76,6 +81,43 @@ public class Lexer {
         advance();
 
         return new Token(TokenType.STRING, sb.toString(), startLine, startColumn);
+    }
+
+    private Token readNumber(int startLine, int startColumn) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        if ((char) currentChar == '-') {
+            sb.append((char) currentChar);
+            advance();
+        }
+
+        while (currentChar != -1 && Character.isDigit((char) currentChar)) {
+            sb.append((char) currentChar);
+            advance();
+        }
+
+        if ((char) currentChar == '.') {
+            do {
+                sb.append((char) currentChar);
+                advance();
+            } while (currentChar != -1 && Character.isDigit((char) currentChar));
+        }
+
+        if ((char) currentChar == 'e' || (char) currentChar == 'E') {
+            sb.append((char) currentChar);
+            advance();
+
+            if ((char) currentChar == '+' || (char) currentChar == '-') {
+                sb.append((char) currentChar);
+                advance();
+            }
+
+            while (currentChar != -1 && Character.isDigit((char) currentChar)) {
+                sb.append((char) currentChar);
+                advance();
+            }
+        }
+
+        return new Token(TokenType.NUMBER, sb.toString(), startLine, startColumn);
     }
 
     private void advance() throws IOException {
