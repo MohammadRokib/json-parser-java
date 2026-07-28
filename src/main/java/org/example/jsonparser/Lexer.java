@@ -26,6 +26,10 @@ public class Lexer {
 
         char c = (char) currentChar;
 
+        if (Character.isLetter(c)) {
+            return readKeyword(startLine, startColumn);
+        }
+
         if (Character.isDigit(c) || c == '-') {
             return readNumber(startLine, startColumn);
         }
@@ -118,6 +122,27 @@ public class Lexer {
         }
 
         return new Token(TokenType.NUMBER, sb.toString(), startLine, startColumn);
+    }
+
+    private Token readKeyword(int startLine, int startColumn) throws IOException {
+        StringBuilder sb = new StringBuilder();
+
+        char c = (char) currentChar;
+        while (currentChar != -1 && Character.isLetter(c)) {
+            sb.append(c);
+            advance();
+            c = (char) currentChar;
+        }
+
+        String lexeme = sb.toString();
+        return switch (lexeme) {
+            case "true" -> new Token(TokenType.TRUE, lexeme, startLine, startColumn);
+            case "false" -> new Token(TokenType.FALSE, lexeme, startLine, startColumn);
+            case "null" -> new Token(TokenType.NULL, lexeme, startLine, startColumn);
+            default -> throw new JsonParseException(
+                    "Unexpected keyword: '" + lexeme, startLine, startColumn
+            );
+        };
     }
 
     private void advance() throws IOException {

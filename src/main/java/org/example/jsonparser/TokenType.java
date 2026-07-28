@@ -7,5 +7,8 @@ public enum TokenType {
     COMMA,
     STRING,
     NUMBER,
+    TRUE,
+    FALSE,
+    NULL,
     EOF
 }

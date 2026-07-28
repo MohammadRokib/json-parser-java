@@ -13,24 +13,12 @@ public class LexerTest {
 
     @Test
     public void readsLeftBrace() throws IOException {
-        var reader = new StringReader("{");
-        Lexer lexer = new Lexer(reader);
-
-        Token token = lexer.nextToken();
-
-        assertEquals(TokenType.LBRACE, token.type());
-        assertEquals("{", token.lexeme());
+        assertTokenLexeme("{", TokenType.LBRACE, "LBRACE");
     }
 
     @Test
     public void readsRightBrace() throws IOException {
-        var reader = new StringReader("}");
-        Lexer lexer = new Lexer(reader);
-
-        Token token = lexer.nextToken();
-
-        assertEquals(TokenType.RBRACE, token.type());
-        assertEquals("}", token.lexeme());
+        assertTokenLexeme("}", TokenType.RBRACE, "RBRACE");
     }
 
     @Test
@@ -61,157 +49,165 @@ public class LexerTest {
 
     @Test
     public void readStringToken() throws IOException {
-        StringReader reader = new StringReader("\"hello\"");
-        PushbackReader pbReader = new PushbackReader(reader);
-        Lexer lexer = new Lexer(pbReader);
-
-        Token token = lexer.nextToken();
-        assertEquals(TokenType.STRING, token.type());
-        assertEquals("\"hello\"", token.lexeme());
+        assertTokenLexeme("\"hello\"", TokenType.STRING, "STRING");
     }
 
     @Test
     public void readEmptyStringToken() throws IOException {
-        StringReader reader = new StringReader("\"\"");
-        PushbackReader pbReader = new PushbackReader(reader);
-        Lexer lexer = new Lexer(pbReader);
-
-        Token token = lexer.nextToken();
-        assertEquals(TokenType.STRING, token.type());
-        assertEquals("\"\"", token.lexeme());
+        assertTokenLexeme("\"\"", TokenType.STRING, "STRING");
     }
 
 
     @Test
     public void readStringWithEscaptedQuote() throws IOException {
-        StringReader reader = new StringReader("\"He said \\\"hi\\\"\"");
-        PushbackReader pbReader = new PushbackReader(reader);
-        Lexer lexer = new Lexer(pbReader);
-
-        Token token = lexer.nextToken();
-        assertEquals(TokenType.STRING, token.type());
-        assertEquals("\"He said \\\"hi\\\"\"", token.lexeme());
+        assertTokenLexeme("\"He said \\\"hi\\\"\"", TokenType.STRING, "STRING");
     }
 
     @Test
     public void throwsOnUnterminatedString() throws IOException {
-        StringReader reader = new StringReader("\"hello");
-        PushbackReader pbReader = new PushbackReader(reader);
-        Lexer lexer = new Lexer(pbReader);
+        assertThrowsOnError(JsonParseException.class, "\"hello");
+    }
 
-        assertThrows(JsonParseException.class, lexer::nextToken);
-    }@Test
+    @Test
     public void readZero() throws IOException {
-        assertNumberLexeme("0");
+        assertTokenLexeme("0", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readNegativeZero() throws IOException {
-        assertNumberLexeme("-0");
+        assertTokenLexeme("-0", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readPositiveInteger() throws IOException {
-        assertNumberLexeme("42");
+        assertTokenLexeme("42", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readNegativeInteger() throws IOException {
-        assertNumberLexeme("-42");
+        assertTokenLexeme("-42", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readPositiveDouble() throws IOException {
-        assertNumberLexeme("3.14159");
+        assertTokenLexeme("3.14159", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readNegativeDouble() throws IOException {
-        assertNumberLexeme("-3.14159");
+        assertTokenLexeme("-3.14159", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readZeroWithDecimal() throws IOException {
-        assertNumberLexeme("0.0001");
+        assertTokenLexeme("0.0001", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readNegativeZeroWithDecimal() throws IOException {
-        assertNumberLexeme("-0.0");
+        assertTokenLexeme("-0.0", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readPositiveScientific() throws IOException {
-        assertNumberLexeme("2e10");
+        assertTokenLexeme("2e10", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readNegativeScientific() throws IOException {
-        assertNumberLexeme("-2e10");
+        assertTokenLexeme("-2e10", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readUppercaseScientific() throws IOException {
-        assertNumberLexeme("2E10");
+        assertTokenLexeme("2E10", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readPositiveScientificWithDecimal() throws IOException {
-        assertNumberLexeme("1.23e10");
+        assertTokenLexeme("1.23e10", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readNegativeScientificWithDecimal() throws IOException {
-        assertNumberLexeme("-1.23e10");
+        assertTokenLexeme("-1.23e10", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readPositiveScientificWithPlusSign() throws IOException {
-        assertNumberLexeme("1.23e+5");
+        assertTokenLexeme("1.23e+5", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readNegativeScientificWithPlusSign() throws IOException {
-        assertNumberLexeme("-1.23e+5");
+        assertTokenLexeme("-1.23e+5", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readUppercaseScientificWithPlusSign() throws IOException {
-        assertNumberLexeme("1.23E+10");
+        assertTokenLexeme("1.23E+10", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readPositiveScientificWithMinusSign() throws IOException {
-        assertNumberLexeme("1e-5");
+        assertTokenLexeme("1e-5", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readNegativeScientificWithMinusSign() throws IOException {
-        assertNumberLexeme("-1.23e-5");
+        assertTokenLexeme("-1.23e-5", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readUppercaseScientificWithMinusSign() throws IOException {
-        assertNumberLexeme("-1.23E-5");
+        assertTokenLexeme("-1.23E-5", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readZeroWithExponent() throws IOException {
-        assertNumberLexeme("0e5");
+        assertTokenLexeme("0e5", TokenType.NUMBER, "NUMBER");
     }
 
     @Test
     public void readZeroWithNegativeExponent() throws IOException {
-        assertNumberLexeme("0e-5");
+        assertTokenLexeme("0e-5", TokenType.NUMBER, "NUMBER");
     }
 
-    private void assertNumberLexeme(String input) throws IOException {
+    @Test
+    public void readsTrue() throws IOException {
+        assertTokenLexeme("true", TokenType.TRUE, "TRUE");
+    }
+
+    @Test
+    public void readsFalse() throws IOException {
+        assertTokenLexeme("false", TokenType.FALSE, "FALSE");
+    }
+
+    @Test
+    public void readsNull() throws IOException {
+        assertTokenLexeme("null", TokenType.NULL, "NULL");
+    }
+
+    @Test
+    public void throwsOnInvalidKeyword() throws IOException {
+        assertThrowsOnError(JsonParseException.class, "truee");
+    }
+
+    private void assertTokenLexeme(String input, TokenType expectedType, String typString) throws IOException {
         StringReader reader = new StringReader(input);
         PushbackReader pbReader = new PushbackReader(reader);
         Lexer lexer = new Lexer(pbReader);
 
         Token token = lexer.nextToken();
-        assertEquals(TokenType.NUMBER, token.type(), "Token type should be NUMBER for input: " + input);
+        assertEquals(expectedType, token.type(), "Token type should be" + typString + " for input: " + input);
         assertEquals(input, token.lexeme(), "Lexeme should match input: " + input);
+    }
+
+    private <T extends Throwable> T assertThrowsOnError(Class<T> expectedType, String input) throws IOException {
+        StringReader reader = new StringReader(input);
+        PushbackReader pbReader = new PushbackReader(reader);
+        Lexer lexer = new Lexer(pbReader);
+
+        return assertThrows(expectedType, lexer::nextToken);
     }
 }
