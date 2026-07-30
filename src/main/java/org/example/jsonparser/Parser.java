@@ -28,13 +28,30 @@ public class Parser {
         while(true) {
             eat(TokenType.STRING);
             eat(TokenType.COLON);
-            eat(TokenType.STRING);
+            parseValue();
 
             if (currentToken.type() == TokenType.COMMA) {
                 eat(TokenType.COMMA);
             } else {
                 break;
             }
+        }
+    }
+
+    private void parseValue() throws IOException {
+        switch (currentToken.type()) {
+            case STRING:
+            case NUMBER:
+            case TRUE:
+            case FALSE:
+            case NULL:
+                eat(currentToken.type());
+                break;
+            default:
+                throw new JsonParseException(
+                        "Expected a value but found " + currentToken.type(),
+                        currentToken.line(), currentToken.column()
+                );
         }
     }
 
