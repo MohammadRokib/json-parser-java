@@ -9,7 +9,7 @@ import java.nio.file.Path;
 public class JsonParser {
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.err.println("Usage: java JsonParse <file.json>");
+            System.err.println("Usage: java JsonParser <file.json>");
             System.exit(1);
         }
 
