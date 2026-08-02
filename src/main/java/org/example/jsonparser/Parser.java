@@ -18,24 +18,26 @@ public class Parser {
         if (currentToken.type() == TokenType.LBRACE) {
             parseObject();
         } else if (currentToken.type() == TokenType.LBRACKET) {
-            currentDepth++;
-            if (currentDepth > MAX_DEPTH) {
-                throw new JsonParseException(
-                        "Maximum nesting depth exceeded",
-                        currentToken.line(), currentToken.column()
-                );
-            }
             parseArray();
         }
         eat(TokenType.EOF);
     }
 
     private void parseObject() throws IOException {
+        currentDepth++;
+        if (currentDepth >= MAX_DEPTH) {
+            throw new JsonParseException(
+                    "Maximum nesting depth exceeded",
+                    currentToken.line(), currentToken.column()
+            );
+        }
+
         eat(TokenType.LBRACE);
         if (currentToken.type() != TokenType.RBRACE) {
             parsePairs();
         }
         eat(TokenType.RBRACE);
+        currentDepth--;
     }
 
     private void parsePairs() throws IOException {
@@ -65,15 +67,7 @@ public class Parser {
                 parseObject();
                 break;
             case LBRACKET:
-                currentDepth++;
-                if (currentDepth >= MAX_DEPTH) {
-                    throw new JsonParseException(
-                            "Maximum nesting depth exceeded",
-                            currentToken.line(), currentToken.column()
-                    );
-                }
                 parseArray();
-                currentDepth--;
                 break;
             default:
                 throw new JsonParseException(
@@ -84,6 +78,14 @@ public class Parser {
     }
 
     private void parseArray() throws IOException {
+        currentDepth++;
+        if (currentDepth >= MAX_DEPTH) {
+            throw new JsonParseException(
+                    "Maximum nesting depth exceeded",
+                    currentToken.line(), currentToken.column()
+            );
+        }
+
         eat(TokenType.LBRACKET);
         while(currentToken.type() != TokenType.RBRACKET) {
             parseValue();
@@ -91,7 +93,7 @@ public class Parser {
                 eat(TokenType.COMMA);
                 if (currentToken.type() == TokenType.RBRACKET) {
                     throw new JsonParseException(
-                            "Expected a value but found" + currentToken.type(),
+                            "Expected a value but found " + currentToken.type(),
                             currentToken.line(), currentToken.column()
                     );
                 }
@@ -101,6 +103,7 @@ public class Parser {
         }
 
         eat(TokenType.RBRACKET);
+        currentDepth--;
     }
 
     private void eat(TokenType type) throws IOException {
