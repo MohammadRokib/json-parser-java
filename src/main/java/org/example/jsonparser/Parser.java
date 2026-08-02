@@ -6,6 +6,9 @@ public class Parser {
     private final Lexer lexer;
     private Token currentToken;
 
+    private int currentDepth = 0;
+    private static final int MAX_DEPTH = 20;
+
     public Parser(Lexer lexer) throws IOException {
         this.lexer = lexer;
         currentToken = lexer.nextToken();
@@ -15,6 +18,13 @@ public class Parser {
         if (currentToken.type() == TokenType.LBRACE) {
             parseObject();
         } else if (currentToken.type() == TokenType.LBRACKET) {
+            currentDepth++;
+            if (currentDepth > MAX_DEPTH) {
+                throw new JsonParseException(
+                        "Maximum nesting depth exceeded",
+                        currentToken.line(), currentToken.column()
+                );
+            }
             parseArray();
         }
         eat(TokenType.EOF);
@@ -55,7 +65,15 @@ public class Parser {
                 parseObject();
                 break;
             case LBRACKET:
+                currentDepth++;
+                if (currentDepth >= MAX_DEPTH) {
+                    throw new JsonParseException(
+                            "Maximum nesting depth exceeded",
+                            currentToken.line(), currentToken.column()
+                    );
+                }
                 parseArray();
+                currentDepth--;
                 break;
             default:
                 throw new JsonParseException(
