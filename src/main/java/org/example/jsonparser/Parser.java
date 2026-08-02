@@ -12,7 +12,11 @@ public class Parser {
     }
 
     public void parse() throws IOException {
-        parseObject();
+        if (currentToken.type() == TokenType.LBRACE) {
+            parseObject();
+        } else if (currentToken.type() == TokenType.LBRACKET) {
+            parseArray();
+        }
         eat(TokenType.EOF);
     }
 
@@ -67,6 +71,12 @@ public class Parser {
             parseValue();
             if (currentToken.type() == TokenType.COMMA) {
                 eat(TokenType.COMMA);
+                if (currentToken.type() == TokenType.RBRACKET) {
+                    throw new JsonParseException(
+                            "Expected a value but found" + currentToken.type(),
+                            currentToken.line(), currentToken.column()
+                    );
+                }
             } else {
                 break;
             }
