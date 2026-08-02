@@ -2,6 +2,7 @@ package org.example.jsonparser;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Arrays;
 
 public class Lexer {
     private final Reader reader;
@@ -73,7 +74,7 @@ public class Lexer {
         sb.append('"');
         advance();
 
-        while (currentChar != '"' && currentChar != -1) {
+        while (currentChar != -1 && currentChar != '"') {
             if (currentChar == '\\') {
                 sb.append('\\');
                 advance();
