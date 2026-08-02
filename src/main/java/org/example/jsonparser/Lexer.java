@@ -2,7 +2,6 @@ package org.example.jsonparser;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Arrays;
 
 public class Lexer {
     private final Reader reader;
@@ -74,6 +73,8 @@ public class Lexer {
         sb.append('"');
         advance();
 
+        String escapeCharacters = "\"\\/bfnrtu";
+
         while (currentChar != -1 && currentChar != '"') {
             if (currentChar == '\\') {
                 sb.append('\\');
@@ -81,6 +82,31 @@ public class Lexer {
 
                 if (currentChar == -1) {
                     throw new JsonParseException("Unterminated string", startLine, startColumn);
+                }
+
+                char escapedChar = (char) currentChar;
+                if (escapeCharacters.indexOf(escapedChar) < 0) {
+                    throw new JsonParseException(
+                            "Invalid escape sequence: \\" + escapedChar,
+                            startLine, startColumn
+                    );
+                }
+
+                if (escapedChar == 'u') {
+                    sb.append('u');
+                    advance();
+
+                    for (int i = 0; i < 4; i++) {
+                        if (currentChar == -1 || !isHexDigit(currentChar)) {
+                            throw new JsonParseException(
+                                    "Invalid unicode escape sequence",
+                                    startLine, startColumn
+                            );
+                        }
+                        sb.append((char) currentChar);
+                        advance();
+                    }
+                    continue;
                 }
             }
             sb.append((char) currentChar);
@@ -192,5 +218,11 @@ public class Lexer {
         while (currentChar != -1 && Character.isWhitespace(currentChar)) {
             advance();
         }
+    }
+
+    private boolean isHexDigit(int c) {
+        return ((c >= '0' && c <= '9') ||
+                (c >= 'a' && c <= 'f') ||
+                (c >= 'A' && c <= 'F'));
     }
 }

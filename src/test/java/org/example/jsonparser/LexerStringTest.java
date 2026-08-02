@@ -17,7 +17,7 @@ public class LexerStringTest extends LexerTest {
 
 
     @Test
-    public void readStringWithEscaptedQuote() throws IOException {
+    public void readStringWithEscapedQuote() throws IOException {
         assertTokenLexeme("\"He said \\\"hi\\\"\"", TokenType.STRING, "STRING");
     }
 

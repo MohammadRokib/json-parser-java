@@ -21,6 +21,11 @@ public class ParserTest {
     }
 
     @Test
+    public void parseObjectWithWhiteSpaceValue() throws IOException {
+        assertThrowNotThrow("{\"value\": \" \"}", false);
+    }
+
+    @Test
     public void throwsOnMissingRightBrace() throws IOException {
         assertThrowNotThrow("{", true);
     }
