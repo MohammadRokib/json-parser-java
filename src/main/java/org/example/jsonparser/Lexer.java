@@ -43,6 +43,14 @@ public class Lexer {
                 advance();
                 yield new Token(TokenType.RBRACE, "}", startLine, startColumn);
             }
+            case '[' -> {
+                advance();
+                yield new Token(TokenType.LBRACKET, "[", startLine, startColumn);
+            }
+            case ']' -> {
+                advance();
+                yield new Token(TokenType.RBRACKET, "]", startLine, startColumn);
+            }
             case ':' -> {
                 advance();
                 yield new Token(TokenType.COLON, ":", startLine, startColumn);

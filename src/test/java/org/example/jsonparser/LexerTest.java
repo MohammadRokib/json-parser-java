@@ -22,6 +22,16 @@ public class LexerTest {
     }
 
     @Test
+    public void readsLeftBracket() throws IOException {
+        assertTokenLexeme("[", TokenType.LBRACKET, "LBRACKET");
+    }
+
+    @Test
+    public void readsRightBracket() throws IOException {
+        assertTokenLexeme("]", TokenType.RBRACKET, "RBRACKET");
+    }
+
+    @Test
     public void readsEofAfterBrace() throws IOException {
         var reader = new StringReader("{}");
         Lexer lexer = new Lexer(reader);

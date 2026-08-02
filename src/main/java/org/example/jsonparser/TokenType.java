@@ -3,6 +3,8 @@ package org.example.jsonparser;
 public enum TokenType {
     LBRACE,
     RBRACE,
+    LBRACKET,
+    RBRACKET,
     COLON,
     COMMA,
     STRING,
