@@ -61,6 +61,54 @@ public class ParserTest {
     }
 
     @Test
+    public void parseArray() throws IOException {
+        assertThrowNotThrow("{\"array\": [1, true, false, null, 0.45, \"name\"]}", false);
+    }
+
+    @Test
+    public void parseThrowsOnInvalidArray() throws IOException {
+        assertThrowNotThrow("{\"array\": [1 true false null 0.45 \"name\"]}", true);
+    }
+
+    @Test
+    public void parseNestedObject() throws IOException {
+        String input = """
+                {
+                    "parentKey1": "parentValue1",
+                	"nestedValue1": {
+                	    "key1": "value1",
+                		"key2": "value2"
+                	},
+                
+                    "array1": [1, 2, 3, 4, 5, "name"],
+                    "number1": -14.e-45,
+                    "parentKey2": "parentValue2"
+                }
+                """;
+
+        assertThrowNotThrow(input, false);
+    }
+
+    @Test
+    public void throwsOnInvalidNestedObject() throws IOException {
+        String input = """
+                {
+                    "parentKey1": "parentValue1",
+                	"nestedValue1": {
+                	    "key1": "value1",
+                		"key2": "value2"
+                	},
+                
+                    "array1": [1, 2, 3, 4, 5, "name],
+                	"number1": -14.e-45,
+                	"parentKey2": "parentValue2
+                }
+                """;
+
+        assertThrowNotThrow(input, true);
+    }
+
+    @Test
     public void parseMixedKeyValue() throws IOException {
         assertThrowNotThrow("{\"string\": \"String\"," +
                             "\"number\": 123.5436," +

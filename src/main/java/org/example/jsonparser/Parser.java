@@ -47,12 +47,32 @@ public class Parser {
             case NULL:
                 eat(currentToken.type());
                 break;
+            case LBRACE:
+                parseObject();
+                break;
+            case LBRACKET:
+                parseArray();
+                break;
             default:
                 throw new JsonParseException(
                         "Expected a value but found " + currentToken.type(),
                         currentToken.line(), currentToken.column()
                 );
         }
+    }
+
+    private void parseArray() throws IOException {
+        eat(TokenType.LBRACKET);
+        while(currentToken.type() != TokenType.RBRACKET) {
+            parseValue();
+            if (currentToken.type() == TokenType.COMMA) {
+                eat(TokenType.COMMA);
+            } else {
+                break;
+            }
+        }
+
+        eat(TokenType.RBRACKET);
     }
 
     private void eat(TokenType type) throws IOException {
