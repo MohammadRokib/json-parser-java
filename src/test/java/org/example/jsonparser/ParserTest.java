@@ -81,7 +81,7 @@ public class ParserTest {
                 	},
                 
                     "array1": [1, 2, 3, 4, 5, "name"],
-                    "number1": -14.e-45,
+                    "number1": -14.6e-45,
                     "parentKey2": "parentValue2"
                 }
                 """;

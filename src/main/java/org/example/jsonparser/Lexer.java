@@ -102,16 +102,36 @@ public class Lexer {
             advance();
         }
 
-        while (currentChar != -1 && Character.isDigit((char) currentChar)) {
+        if (currentChar != -1 && !Character.isDigit((char) currentChar)) {
+            throw new JsonParseException("Invalid number: missing integer part", startLine, startColumn);
+        }
+
+        if ((char) currentChar == '0') {
             sb.append((char) currentChar);
             advance();
+
+            if (currentChar != -1 && Character.isDigit((char) currentChar)) {
+                throw new JsonParseException("Invalid number: leading zeros are not allowed", startLine, startColumn);
+            }
+        } else {
+            while (currentChar != -1 && Character.isDigit((char) currentChar)) {
+                sb.append((char) currentChar);
+                advance();
+            }
         }
 
         if ((char) currentChar == '.') {
-            do {
+            sb.append((char) currentChar);
+            advance();
+
+            if (currentChar != -1 && !Character.isDigit((char) currentChar)) {
+                throw new JsonParseException("Invalid number: missing digits after decimal", startLine, startColumn);
+            }
+
+            while (currentChar != -1 && Character.isDigit((char) currentChar)) {
                 sb.append((char) currentChar);
                 advance();
-            } while (currentChar != -1 && Character.isDigit((char) currentChar));
+            }
         }
 
         if ((char) currentChar == 'e' || (char) currentChar == 'E') {
@@ -121,6 +141,10 @@ public class Lexer {
             if ((char) currentChar == '+' || (char) currentChar == '-') {
                 sb.append((char) currentChar);
                 advance();
+            }
+
+            if (currentChar != -1 && !Character.isDigit((char) currentChar)) {
+                throw new JsonParseException("Invalid number: missing digits in exponent", startLine, startColumn);
             }
 
             while (currentChar != -1 && Character.isDigit((char) currentChar)) {

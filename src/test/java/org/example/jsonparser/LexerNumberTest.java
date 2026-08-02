@@ -110,8 +110,8 @@ public class LexerNumberTest extends LexerTest {
         assertTokenLexeme("0e-5", TokenType.NUMBER, "NUMBER");
     }
 
-    /*@Test
+    @Test
     public void throwsOnInvalidNumber() throws IOException {
         assertThrowsOnError(JsonParseException.class, "-.e-");
-    }*/
+    }
 }
