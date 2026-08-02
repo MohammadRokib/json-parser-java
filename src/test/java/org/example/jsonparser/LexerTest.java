@@ -3,7 +3,6 @@ package org.example.jsonparser;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.io.PushbackReader;
 import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,8 +58,7 @@ public class LexerTest {
 
     protected void assertTokenLexeme(String input, TokenType expectedType, String typString) throws IOException {
         StringReader reader = new StringReader(input);
-        PushbackReader pbReader = new PushbackReader(reader);
-        Lexer lexer = new Lexer(pbReader);
+        Lexer lexer = new Lexer(reader);
 
         Token token = lexer.nextToken();
         assertEquals(expectedType, token.type(), "Token type should be" + typString + " for input: " + input);
@@ -69,8 +67,7 @@ public class LexerTest {
 
     protected <T extends Throwable> T assertThrowsOnError(Class<T> expectedType, String input) throws IOException {
         StringReader reader = new StringReader(input);
-        PushbackReader pbReader = new PushbackReader(reader);
-        Lexer lexer = new Lexer(pbReader);
+        Lexer lexer = new Lexer(reader);
 
         return assertThrows(expectedType, lexer::nextToken);
     }

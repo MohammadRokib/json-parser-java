@@ -2,7 +2,6 @@ package org.example.jsonparser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PushbackReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -15,9 +14,7 @@ public class JsonParser {
 
         Path path = Path.of(args[0]);
         try (BufferedReader bufferedReader = Files.newBufferedReader(path)) {
-            PushbackReader reader = new PushbackReader(bufferedReader);
-
-            Lexer lexer = new Lexer(reader);
+            Lexer lexer = new Lexer(bufferedReader);
             Parser parser = new Parser(lexer);
 
             parser.parse();

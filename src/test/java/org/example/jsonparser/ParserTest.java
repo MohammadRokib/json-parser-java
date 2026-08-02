@@ -3,7 +3,6 @@ package org.example.jsonparser;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.io.PushbackReader;
 import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -133,9 +132,8 @@ public class ParserTest {
 
     private void assertThrowNotThrow(String input, boolean shouldThrow) throws IOException {
         StringReader reader = new StringReader(input);
-        PushbackReader pbReader = new PushbackReader(reader);
 
-        Lexer lexer = new Lexer(pbReader);
+        Lexer lexer = new Lexer(reader);
         Parser parser = new Parser(lexer);
 
         if (shouldThrow) {

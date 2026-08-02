@@ -5,7 +5,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
-import java.io.PushbackReader;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,9 +27,8 @@ public class OfficialSuiteTest {
         String content = Files.readString(filePath);
 
         StringReader reader = new StringReader(content);
-        PushbackReader pbReader = new PushbackReader(reader);
 
-        Lexer lexer = new Lexer(pbReader);
+        Lexer lexer = new Lexer(reader);
         Parser parser = new Parser(lexer);
 
         if (fileName.startsWith("pass")) {
