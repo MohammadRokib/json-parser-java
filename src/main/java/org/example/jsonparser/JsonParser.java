@@ -22,7 +22,6 @@ public class JsonParser {
 
             parser.parse();
             System.out.println("Valid JSON");
-            System.exit(0);
         } catch (JsonParseException e) {
             System.err.println("Invalid JSON: " + e.getMessage());
             System.exit(1);
