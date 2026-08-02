@@ -76,12 +76,13 @@ public class Lexer {
         String escapeCharacters = "\"\\/bfnrtu";
 
         while (currentChar != -1 && currentChar != '"') {
-            if (currentChar == '\n') {
+            if (currentChar >= 0 && currentChar < 32) {
                 throw new JsonParseException(
-                        "Invalid new line character inside string",
+                        "Invalid unescaped control character in string",
                         startLine, startColumn
                 );
             }
+
             if (currentChar == '\\') {
                 sb.append('\\');
                 advance();
