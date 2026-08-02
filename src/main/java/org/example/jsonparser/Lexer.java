@@ -9,6 +9,8 @@ public class Lexer {
     private int line = 1;
     private int column = 0;
 
+    private static final String ESCAPE_CHARACTERS = "\"\\/bfnrtu";
+
     public  Lexer(Reader reader) throws IOException {
         this.reader = reader;
         advance();
@@ -73,8 +75,6 @@ public class Lexer {
         sb.append('"');
         advance();
 
-        String escapeCharacters = "\"\\/bfnrtu";
-
         while (currentChar != -1 && currentChar != '"') {
             if (currentChar < 32) {
                 throw new JsonParseException(
@@ -92,7 +92,7 @@ public class Lexer {
                 }
 
                 char escapedChar = (char) currentChar;
-                if (escapeCharacters.indexOf(escapedChar) < 0) {
+                if (ESCAPE_CHARACTERS.indexOf(escapedChar) < 0) {
                     throw new JsonParseException(
                             "Invalid escape sequence: \\" + escapedChar,
                             line, column
