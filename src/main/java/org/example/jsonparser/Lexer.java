@@ -76,7 +76,7 @@ public class Lexer {
         String escapeCharacters = "\"\\/bfnrtu";
 
         while (currentChar != -1 && currentChar != '"') {
-            if (currentChar >= 0 && currentChar < 32) {
+            if (currentChar < 32) {
                 throw new JsonParseException(
                         "Invalid unescaped control character in string",
                         line, column
