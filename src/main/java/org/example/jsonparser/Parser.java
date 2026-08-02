@@ -56,21 +56,10 @@ public class Parser {
 
     private void parseValue() throws IOException {
         switch (currentToken.type()) {
-            case STRING:
-            case NUMBER:
-            case TRUE:
-            case FALSE:
-            case NULL:
-                eat(currentToken.type());
-                break;
-            case LBRACE:
-                parseObject();
-                break;
-            case LBRACKET:
-                parseArray();
-                break;
-            default:
-                throw new JsonParseException(
+            case STRING, NUMBER, TRUE, FALSE, NULL -> eat(currentToken.type());
+            case LBRACE -> parseObject();
+            case LBRACKET -> parseArray();
+            default -> throw new JsonParseException(
                         "Expected a value but found " + currentToken.type(),
                         currentToken.line(), currentToken.column()
                 );
