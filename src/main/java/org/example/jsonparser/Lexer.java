@@ -79,7 +79,7 @@ public class Lexer {
             if (currentChar >= 0 && currentChar < 32) {
                 throw new JsonParseException(
                         "Invalid unescaped control character in string",
-                        startLine, startColumn
+                        line, column
                 );
             }
 
@@ -95,7 +95,7 @@ public class Lexer {
                 if (escapeCharacters.indexOf(escapedChar) < 0) {
                     throw new JsonParseException(
                             "Invalid escape sequence: \\" + escapedChar,
-                            startLine, startColumn
+                            line, column
                     );
                 }
 
@@ -107,7 +107,7 @@ public class Lexer {
                         if (currentChar == -1 || !isHexDigit(currentChar)) {
                             throw new JsonParseException(
                                     "Invalid unicode escape sequence",
-                                    startLine, startColumn
+                                    line, column
                             );
                         }
                         sb.append((char) currentChar);
@@ -131,58 +131,58 @@ public class Lexer {
 
     private Token readNumber(int startLine, int startColumn) throws IOException {
         StringBuilder sb = new StringBuilder();
-        if ((char) currentChar == '-') {
-            sb.append((char) currentChar);
+        if (current() == '-') {
+            sb.append(current());
             advance();
         }
 
-        if (currentChar != -1 && !Character.isDigit((char) currentChar)) {
+        if (!isDigit()) {
             throw new JsonParseException("Invalid number: missing integer part", startLine, startColumn);
         }
 
-        if ((char) currentChar == '0') {
-            sb.append((char) currentChar);
+        if (current() == '0') {
+            sb.append(current());
             advance();
 
-            if (currentChar != -1 && Character.isDigit((char) currentChar)) {
+            if (isDigit()) {
                 throw new JsonParseException("Invalid number: leading zeros are not allowed", startLine, startColumn);
             }
         } else {
-            while (currentChar != -1 && Character.isDigit((char) currentChar)) {
-                sb.append((char) currentChar);
+            while (isDigit()) {
+                sb.append(current());
                 advance();
             }
         }
 
-        if ((char) currentChar == '.') {
-            sb.append((char) currentChar);
+        if (current() == '.') {
+            sb.append(current());
             advance();
 
-            if (currentChar != -1 && !Character.isDigit((char) currentChar)) {
+            if (!isDigit()) {
                 throw new JsonParseException("Invalid number: missing digits after decimal", startLine, startColumn);
             }
 
-            while (currentChar != -1 && Character.isDigit((char) currentChar)) {
-                sb.append((char) currentChar);
+            while (isDigit()) {
+                sb.append(current());
                 advance();
             }
         }
 
-        if ((char) currentChar == 'e' || (char) currentChar == 'E') {
-            sb.append((char) currentChar);
+        if (current() == 'e' || current() == 'E') {
+            sb.append(current());
             advance();
 
-            if ((char) currentChar == '+' || (char) currentChar == '-') {
-                sb.append((char) currentChar);
+            if (current() == '+' || current() == '-') {
+                sb.append(current());
                 advance();
             }
 
-            if (currentChar != -1 && !Character.isDigit((char) currentChar)) {
+            if (!isDigit()) {
                 throw new JsonParseException("Invalid number: missing digits in exponent", startLine, startColumn);
             }
 
-            while (currentChar != -1 && Character.isDigit((char) currentChar)) {
-                sb.append((char) currentChar);
+            while (isDigit()) {
+                sb.append(current());
                 advance();
             }
         }
@@ -231,5 +231,13 @@ public class Lexer {
         return ((c >= '0' && c <= '9') ||
                 (c >= 'a' && c <= 'f') ||
                 (c >= 'A' && c <= 'F'));
+    }
+
+    private char current() {
+        return (char) currentChar;
+    }
+
+    private boolean isDigit() {
+        return currentChar != -1 && Character.isDigit(current());
     }
 }
