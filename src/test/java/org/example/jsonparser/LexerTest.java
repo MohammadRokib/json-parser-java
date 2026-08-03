@@ -1,38 +1,29 @@
 package org.example.jsonparser;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.IOException;
 import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LexerTest {
-
-    @Test
-    public void readsLeftBrace() throws IOException {
-        assertTokenLexeme("{", TokenType.LBRACE, "LBRACE");
-    }
-
-    @Test
-    public void readsRightBrace() throws IOException {
-        assertTokenLexeme("}", TokenType.RBRACE, "RBRACE");
-    }
-
-    @Test
-    public void readsLeftBracket() throws IOException {
-        assertTokenLexeme("[", TokenType.LBRACKET, "LBRACKET");
-    }
-
-    @Test
-    public void readsRightBracket() throws IOException {
-        assertTokenLexeme("]", TokenType.RBRACKET, "RBRACKET");
+    @ParameterizedTest(name = "\"{0}\" is tokenized as {1}")
+    @CsvSource({
+            "{, LBRACE",
+            "}, RBRACE",
+            "[, LBRACKET",
+            "], RBRACKET"
+    })
+    public void readsSingleCharacterToken(String input, TokenType expectedType) throws IOException {
+        LexerAssertions.assertTokenLexeme(input, expectedType);
     }
 
     @Test
     public void readsEofAfterBrace() throws IOException {
-        var reader = new StringReader("{}");
+        StringReader reader = new StringReader("{}");
         Lexer lexer = new Lexer(reader);
 
         lexer.nextToken();
@@ -43,32 +34,16 @@ public class LexerTest {
     }
 
     @Test
-    public void skipsWhiteSpace() throws IOException {
-        var reader = new StringReader("  {   }  ");
+    public void skipWhiteSpace() throws IOException {
+        StringReader reader = new StringReader("  {  }  ");
         Lexer lexer = new Lexer(reader);
 
         Token lbrace = lexer.nextToken();
         Token rbrace = lexer.nextToken();
-        Token eof = lexer.nextToken();
+        Token eof    = lexer.nextToken();
 
         assertEquals(TokenType.LBRACE, lbrace.type());
         assertEquals(TokenType.RBRACE, rbrace.type());
         assertEquals(TokenType.EOF, eof.type());
-    }
-
-    protected void assertTokenLexeme(String input, TokenType expectedType, String typString) throws IOException {
-        StringReader reader = new StringReader(input);
-        Lexer lexer = new Lexer(reader);
-
-        Token token = lexer.nextToken();
-        assertEquals(expectedType, token.type(), "Token type should be" + typString + " for input: " + input);
-        assertEquals(input, token.lexeme(), "Lexeme should match input: " + input);
-    }
-
-    protected <T extends Throwable> T assertThrowsOnError(Class<T> expectedType, String input) throws IOException {
-        StringReader reader = new StringReader(input);
-        Lexer lexer = new Lexer(reader);
-
-        return assertThrows(expectedType, lexer::nextToken);
     }
 }

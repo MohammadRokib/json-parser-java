@@ -1,77 +1,61 @@
 package org.example.jsonparser;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ParserTest {
-    @Test
-    public void parseEmptyObject() throws IOException {
-        assertThrowNotThrow("{}", false);
+    private static Stream<Arguments> validJson() {
+        return Stream.of(
+                Arguments.of("empty object", "{}"),
+                Arguments.of("empty object with whitespace", "  {   }  "),
+                Arguments.of("object with whitespace-only value", "{\"value\": \" \"}"),
+                Arguments.of("single key/value pair", "{\"key\": \"value\"}"),
+                Arguments.of("multiple key/value pairs", "{\"key1\": \"value1\", \"key2\": \"value2\"}"),
+                Arguments.of("array value", "{\"array\": [1, true, false, null, 0.45, \"name\"]}"),
+                Arguments.of("mixed value types", "{\"string\": \"String\"," +
+                        "\"number\": 123.5436," +
+                        "\"right\": true," +
+                        "\"wrong\": false," +
+                        "\"none\": null}")
+        );
     }
 
-    @Test
-    public void parseEmptyObjectWithWhiteSpace() throws IOException {
-        assertThrowNotThrow("  {   }  ", false);
+    private static Stream<Arguments> invalidJson() {
+        return Stream.of(
+                Arguments.of("missing right brace", "{"),
+                Arguments.of("trailing garbage after object", "{ } }"),
+                Arguments.of("missing colon between key and value", "{\"key\" \"value\"}"),
+                Arguments.of("missing comma between pairs", "{\"key1\": \"value1\" \"key2\": \"value2\"}"),
+                Arguments.of("missing left brace", "\"key1\": \"value1\", \"key2\": \"value2\"}"),
+                Arguments.of("missing right brace with content", "{\"key1\": \"value1\", \"key2\": \"value2\""),
+                Arguments.of("array missing commas between values", "{\"array\": [1 true false null 0.45 \"name\"]}"),
+                Arguments.of("invalid keyword among mixed values", "{\"string\": \"String\"," +
+                        "\"number\": 123.5436," +
+                        "\"right\": trues," +
+                        "\"wrong\": false," +
+                        "\"none\": null}")
+        );
     }
 
-    @Test
-    public void parseObjectWithWhiteSpaceValue() throws IOException {
-        assertThrowNotThrow("{\"value\": \" \"}", false);
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("validJson")
+    public void parsesValidJson(String description, String input) throws IOException {
+        assertThrowNotThrow(input, false);
     }
 
-    @Test
-    public void throwsOnMissingRightBrace() throws IOException {
-        assertThrowNotThrow("{", true);
-    }
-
-    @Test
-    public void throwsOnTrailingGarbage() throws IOException {
-        assertThrowNotThrow("{ } }", true);
-    }
-
-    @Test
-    public void parseSingleKeyValue() throws IOException {
-        assertThrowNotThrow("{\"key\": \"value\"}", false);
-    }
-
-    @Test
-    public void parseMultipleKeyValue() throws IOException {
-        assertThrowNotThrow("{\"key1\": \"value1\", \"key2\": \"value2\"}", false);
-    }
-
-    @Test
-    public void parseThrowOnMissingColon() throws IOException {
-        assertThrowNotThrow("{\"key\" \"value\"}", true);
-    }
-
-    @Test
-    public void parseThrowOnMissingComma() throws IOException {
-        assertThrowNotThrow("{\"key1\": \"value1\" \"key2\": \"value2\"}", true);
-    }
-
-    @Test
-    public void parseThrowOnMissingLBrace() throws IOException {
-        assertThrowNotThrow("\"key1\": \"value1\", \"key2\": \"value2\"}", true);
-    }
-
-    @Test
-    public void parseThrowOnMissingRBrace() throws IOException {
-        assertThrowNotThrow("{\"key1\": \"value1\", \"key2\": \"value2\"", true);
-    }
-
-    @Test
-    public void parseArray() throws IOException {
-        assertThrowNotThrow("{\"array\": [1, true, false, null, 0.45, \"name\"]}", false);
-    }
-
-    @Test
-    public void parseThrowsOnInvalidArray() throws IOException {
-        assertThrowNotThrow("{\"array\": [1 true false null 0.45 \"name\"]}", true);
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("invalidJson")
+    public void throwsOnInvalidJson(String description, String input) throws IOException {
+        assertThrowNotThrow(input, true);
     }
 
     @Test
@@ -79,11 +63,11 @@ public class ParserTest {
         String input = """
                 {
                     "parentKey1": "parentValue1",
-                	"nestedValue1": {
-                	    "key1": "value1",
-                		"key2": "value2"
-                	},
-                
+                    "nestedValue1": {
+                        "key1": "value1",
+                        "key2": "value2"
+                    },
+
                     "array1": [1, 2, 3, 4, 5, "name"],
                     "number1": -14.6e-45,
                     "parentKey2": "parentValue2"
@@ -98,36 +82,18 @@ public class ParserTest {
         String input = """
                 {
                     "parentKey1": "parentValue1",
-                	"nestedValue1": {
-                	    "key1": "value1",
-                		"key2": "value2"
-                	},
-                
+                    "nestedValue1": {
+                        "key1": "value1",
+                        "key2": "value2"
+                    },
+
                     "array1": [1, 2, 3, 4, 5, "name],
-                	"number1": -14.e-45,
-                	"parentKey2": "parentValue2
+                    "number1": -14.e-45,
+                    "parentKey2": "parentValue2
                 }
                 """;
 
         assertThrowNotThrow(input, true);
-    }
-
-    @Test
-    public void parseMixedKeyValue() throws IOException {
-        assertThrowNotThrow("{\"string\": \"String\"," +
-                            "\"number\": 123.5436," +
-                            "\"right\": true," +
-                            "\"wrong\": false," +
-                            "\"none\": null}", false);
-    }
-
-    @Test
-    public void throwsOnWrongMixedKeyValue() throws IOException {
-        assertThrowNotThrow("{\"string\": \"String\"," +
-                "\"number\": 123.5436," +
-                "\"right\": trues," +
-                "\"wrong\": false," +
-                "\"none\": null}", true);
     }
 
     private void assertThrowNotThrow(String input, boolean shouldThrow) throws IOException {
